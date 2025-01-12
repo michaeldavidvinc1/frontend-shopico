@@ -81,7 +81,7 @@ function LoginPage() {
                             Let's Sign you in
                         </h2>
                         <p className="mt-2 text-sm text-muted-foreground">
-                            You have don't an account <Link href="/register" className="font-bold underline">register</Link>
+                            You have don't an account <Link href={ROUTES.REGISTER} className="font-bold underline">register</Link>
                         </p>
                     </div>
 
