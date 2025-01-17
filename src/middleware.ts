@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('next-auth.session-token')?.value;
 
   // Halaman yang hanya boleh diakses oleh pengguna yang sudah login
-  const protectedRoutes = ['/'];
+  const protectedRoutes = ['/cart'];
 
   const guestRoutes = ['/login', '/register'];
 
@@ -29,5 +29,5 @@ export function middleware(request: NextRequest) {
 
 // Configurasi routes yang akan terkena middleware
 export const config = {
-  matcher: ['/', '/login', '/register'], 
+  matcher: ['/cart', '/login', '/register'], 
 };

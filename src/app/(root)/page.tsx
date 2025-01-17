@@ -1,12 +1,11 @@
-'use client'
-import { Button } from "@/components/ui/button";
-import { useSession } from "next-auth/react";
-
+import Banner from "./components/banner";
+import HeaderPage from "./components/header";
 
 export default function Home() {
-  const {data: session} = useSession();
-  console.log(session)
   return (
-    <Button>Test</Button>
+    <div className="">
+      <HeaderPage />
+      <Banner />
+    </div>
   );
 }
