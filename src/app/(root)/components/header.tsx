@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 import SearchInput from './search-input'
 import { Barcode, Headset, Heart, ShoppingBag, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ROUTES } from '@/constant'
 
 export default function HeaderPage() {
     return (
@@ -14,7 +14,7 @@ export default function HeaderPage() {
                         <Barcode className='w-4 h-4' />
                         <p className='uppercase text-xs'>welcome to shopico</p>
                     </div>
-                    <Link href="#" className='text-sm text-muted-foreground'>Become a seller</Link>
+                    <Link href={ROUTES.CREATE_STORE} className='text-sm text-muted-foreground'>Become a seller</Link>
                 </div>
                 <div className='py-4 flex justify-between items-center'>
                     <Image src="/image/logo.svg" width={100} height={100} alt='Logo' />

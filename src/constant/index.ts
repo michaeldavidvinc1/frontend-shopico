@@ -6,5 +6,6 @@ export const API_URL = {
 export const ROUTES = {
     LOGIN: "/login",
     REGISTER: "/register",
-    HOME: "/"
+    HOME: "/",
+    CREATE_STORE: "/store/create"
 }
