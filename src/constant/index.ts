@@ -7,5 +7,4 @@ export const ROUTES = {
     LOGIN: "/login",
     REGISTER: "/register",
     HOME: "/",
-    CREATE_STORE: "/store/create"
 }
