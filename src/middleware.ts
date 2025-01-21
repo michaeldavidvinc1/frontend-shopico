@@ -1,33 +1,41 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { ROUTES } from './constant';
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('next-auth.session-token')?.value;
 
-  // Halaman yang hanya boleh diakses oleh pengguna yang sudah login
-  const protectedRoutes = ['/cart'];
+  const protectedRoutes = ['/cart', '/store/:slug/dashboard'];
+  const guestRoutes = [ROUTES.LOGIN, ROUTES.REGISTER];
 
-  const guestRoutes = ['/login', '/register'];
+  const isProtectedRoute = protectedRoutes.some(route => {
+    if (route.includes(':slug')) {
+      const regex = new RegExp(route.replace(':slug', '[^/]+'));
+      return regex.test(request.nextUrl.pathname);
+    }
+    return route === request.nextUrl.pathname;
+  });
 
-  if (protectedRoutes.includes(request.nextUrl.pathname) && !token) {
-    // Jika tidak ada token, redirect ke halaman login
+  if (isProtectedRoute && !token) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = ROUTES.LOGIN;
     return NextResponse.redirect(url);
   }
 
-  if(guestRoutes.includes(request.nextUrl.pathname) && token){
+  if (guestRoutes.includes(request.nextUrl.pathname) && token) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = ROUTES.HOME;
     return NextResponse.redirect(url);
   }
 
-
-  // Jika token ada, lanjutkan ke halaman tujuan
   return NextResponse.next();
 }
 
-// Configurasi routes yang akan terkena middleware
 export const config = {
-  matcher: ['/cart', '/login', '/register'], 
+  matcher: [
+    '/cart',
+    '/login',
+    '/register',
+    '/store/:slug/dashboard',
+  ],
 };

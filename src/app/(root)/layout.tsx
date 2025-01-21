@@ -5,6 +5,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Outfit } from "next/font/google";
+import { Toaster } from "sonner";
 
 const outfitFont = Outfit({
   subsets: ['latin']
@@ -27,6 +28,7 @@ export default function RootLayout({
         className={`${outfitFont.className} antialiased`}
       >
         <ReduxProvider>
+          <Toaster position="top-right" richColors />
           {children}
         </ReduxProvider>
       </body>

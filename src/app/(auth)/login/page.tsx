@@ -19,8 +19,8 @@ import { Button } from "@/components/ui/button";
 function LoginPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    type FormData = z.infer<typeof LoginSchema>
     const [showPassword, setShowPassword] = useState(false);
+    type FormData = z.infer<typeof LoginSchema>
     const form = useForm<FormData>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
