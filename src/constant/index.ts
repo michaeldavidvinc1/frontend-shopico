@@ -8,5 +8,5 @@ export const ROUTES = {
     LOGIN: "/login",
     REGISTER: "/register",
     HOME: "/",
-    DASHBOARD_STORE: (slug: string) => `/store/${slug}/dashboard`
+    DASHBOARD_STORE: (slug: string) => `/store/${slug}`
 }

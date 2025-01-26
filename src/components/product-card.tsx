@@ -1,7 +1,7 @@
 "use client";
 
-import { Heart, Plus, Minus, ShoppingCart } from 'lucide-react';
-import React, { useState } from 'react';
+import { Heart, ShoppingCart } from 'lucide-react';
+import React from 'react';
 import StarRating from './rating-start';
 
 interface ProductCardProps {
@@ -62,3 +62,4 @@ const ProductCard: React.FC<ProductCardProps> = ({ name, category, harga, image,
 };
 
 export default ProductCard;
+
