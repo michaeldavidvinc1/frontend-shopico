@@ -1,11 +1,16 @@
+"use client"
+
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import SearchInput from './search-input'
 import { Barcode, Headset, Heart, ShoppingBag, User } from 'lucide-react'
 import BecomeSeller from './become-seller'
+import {useSession} from "next-auth/react";
 
 export default function HeaderPage() {
+    const { data: session, status } = useSession();
+    console.log(session)
     return (
         <div className='w-full'>
             <div className='mx-auto px-4 md:px-20 lg:px-24'>

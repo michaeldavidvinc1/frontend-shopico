@@ -21,7 +21,8 @@ export const metadata: Metadata = {
     description: "Ecommerce Shopico",
 };
 
-export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
+export default async function RootLayout({children, params}: Readonly<{ children: React.ReactNode; params: { storeSlug: string }; }>) {
+    const { storeSlug } = await params;
     return (
         <html lang="en">
         <body
@@ -33,7 +34,7 @@ export default function RootLayout({children,}: Readonly<{ children: React.React
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">
                         <StoreSwitcher />
-                        <MainNav className="mx-6" />
+                        <MainNav className="mx-6" storeSlug={storeSlug} />
                         <div className="ml-auto flex items-center space-x-4">
                             <NotificationButton />
                             <UserNav />

@@ -5,7 +5,8 @@ import { ROUTES } from './constant';
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('next-auth.session-token')?.value;
 
-  const protectedRoutes = ['/cart', '/store/:slug/dashboard'];
+  console.log(storeSlug);
+  const protectedRoutes = ['/cart', '/store/:slug'];
   const guestRoutes = [ROUTES.LOGIN, ROUTES.REGISTER];
 
   const isProtectedRoute = protectedRoutes.some(route => {
@@ -36,6 +37,6 @@ export const config = {
     '/cart',
     '/login',
     '/register',
-    '/store/:slug/dashboard',
+    '/store/:slug',
   ],
 };

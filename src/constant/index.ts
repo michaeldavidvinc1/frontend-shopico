@@ -8,5 +8,6 @@ export const ROUTES = {
     LOGIN: "/login",
     REGISTER: "/register",
     HOME: "/",
-    DASHBOARD_STORE: (slug: string) => `/store/${slug}`
+    DASHBOARD_STORE: (slug: string) => `/store/${slug}`,
+    PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product`,
 }

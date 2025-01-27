@@ -5,34 +5,40 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { FC } from "react";
+import {cn} from "@/lib/utils";
+import {FC} from "react";
+import {ChevronDown} from "lucide-react";
+import {ROUTES} from "@/constant";
 
 interface MainNavProps extends React.HTMLAttributes<HTMLElement> {
     className?: string;
+    storeSlug: string;
 }
 
-const links = [
-    {
-        label: "Dashboard",
-        path: "/",
-    },
-    {
-        label: "Product",
-        children: [
-            {
-                label: "Product",
-                path: "/",
-            },
-            {
-                label: "Tambah Product",
-                path: "/",
-            },
-        ],
-    },
-];
-
-const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
+const MainNav: FC<MainNavProps> = ({className, storeSlug, ...props}) => {
+    const links = [
+        {
+            label: "Dashboard",
+            path: ROUTES.DASHBOARD_STORE(storeSlug),
+        },
+        {
+            label: "Product",
+            path: ROUTES.PRODUCT_SELLER(storeSlug),
+        },
+        {
+            label: "Product asd",
+            children: [
+                {
+                    label: "Product asdd",
+                    path: "/",
+                },
+                {
+                    label: "Tambah Product",
+                    path: "/",
+                },
+            ],
+        },
+    ];
     return (
         <nav
             className={cn("flex items-center space-x-4 lg:space-x-6", className)}
@@ -52,9 +58,10 @@ const MainNav: FC<MainNavProps> = ({ className, ...props }) => {
                         {item.children && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger>
-                  <span className="text-sm font-medium transition-colors hover:text-primary">
-                    {item.label}
-                  </span>
+                                  <span className="text-sm font-medium transition-colors hover:text-primary flex gap-2 items-center">
+                                    {item.label}
+                                      <ChevronDown className="w-4 h-4" />
+                                  </span>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56">
                                     {item.children.map((menu) => (
