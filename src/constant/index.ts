@@ -11,4 +11,5 @@ export const ROUTES = {
     HOME: "/",
     DASHBOARD_STORE: (slug: string) => `/store/${slug}`,
     PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product`,
+    CREATE_PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product/create`,
 }
