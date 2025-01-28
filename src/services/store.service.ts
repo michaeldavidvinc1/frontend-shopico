@@ -10,7 +10,13 @@ export const storeApi = apiSlice.injectEndpoints({
                body: credentials
             })
         }),
+        getStoreByUser: builder.query({
+            query: (id: string) => ({
+                url: API_URL.GET_STORE_BY_USER(id),
+                method: "GET"
+            })
+        })
     })
 });
 
-export const {useCreateStoreMutation} = storeApi
+export const {useCreateStoreMutation, useGetStoreByUserQuery} = storeApi

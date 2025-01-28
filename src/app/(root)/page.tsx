@@ -1,8 +1,11 @@
+"use client";
+
 import ProductCard from "@/components/product-card";
 import Banner from "./components/banner";
 import HeaderPage from "./components/header";
 import ListCategory from "./components/list-category";
 import BestSeller from "./components/best-seller";
+import {useSession} from "next-auth/react";
 
 const product = [
   {
@@ -78,9 +81,10 @@ const product = [
 ]
 
 export default function Home() {
+  const { data: session, status } = useSession();
   return (
     <div className="">
-      <HeaderPage />
+      <HeaderPage session={session} status={status} />
       <Banner />
       <ListCategory />
       <BestSeller />
