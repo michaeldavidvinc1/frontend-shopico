@@ -2,7 +2,8 @@ export const API_URL = {
     LOGIN: "/auth/login",
     REGISTER: "/auth/register",
     CREATE_STORE: "/store/create",
-    GET_STORE_BY_USER: (id: string) => `/store/list/${id}`
+    GET_STORE_BY_USER: (id: string) => `/store/list/${id}`,
+    CREATE_PRODUCT: "/product/create",
 }
 
 export const ROUTES = {
