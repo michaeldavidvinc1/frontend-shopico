@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { CreateProductSellerSchema } from '@/schema';
@@ -11,6 +11,8 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { ROUTES } from '@/constant';
+import ImageUpload from '@/components/image-upload';
+import { Button } from '@/components/ui/button';
 
 interface CreateProductFormProps {
     storeSlug: string
@@ -20,32 +22,41 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
 
     const router = useRouter();
     const [createProduct, { isLoading }] = useCreateProductMutation();
+    const [uploadedImages, setUploadedImages] = useState<File[]>([]);
     type FormData = z.infer<typeof CreateProductSellerSchema>
     const form = useForm<FormData>({
         resolver: zodResolver(CreateProductSellerSchema),
         defaultValues: {
             storeId: storeSlug,
-            categoryId: "",
-            name: "",
-            slug: "",
-            description: "",
-            stock: 0,
-            price: 0,
-            weight: 0,
+            categoryId: "asd",
+            name: "asd",
+            slug: "asd",
+            description: "asd",
+            stock: 1,
+            price: 1,
+            weight: 1,
             image: []
         },
     });
 
+    const handleImageUpload = (files: File[]) => {
+        setUploadedImages(files);
+        form.setValue("image", files);
+    };
+
+
     async function onSubmit(values: FormData) {
-        try {
-            const res = await createProduct(values).unwrap();
-            if (res.success) {
-                const user = res.data;
-                router.push(ROUTES.PRODUCT_SELLER(storeSlug));
-            }
-        } catch (error: any) {
-            toast.error(error.data.msg)
-        }
+        console.log(values)
+
+        // try {
+        //     const res = await createProduct(values).unwrap();
+        //     if (res.success) {
+        //         const user = res.data;
+        //         router.push(ROUTES.PRODUCT_SELLER(storeSlug));
+        //     }
+        // } catch (error: any) {
+        //     toast.error(error.data.msg)
+        // }
     }
 
     return (
@@ -56,7 +67,10 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
                         <FormItem>
                             <FormLabel>Product Image</FormLabel>
                             <FormControl>
-                                
+                                <ImageUpload
+                                    multiple
+                                    onUpload={handleImageUpload}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -74,12 +88,11 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
 
                 {/* Submit Button */}
                 <div>
-                    <button
+                    <Button
                         type="submit"
-                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                     >
                         Save
-                    </button>
+                    </Button>
                 </div>
 
             </form>
