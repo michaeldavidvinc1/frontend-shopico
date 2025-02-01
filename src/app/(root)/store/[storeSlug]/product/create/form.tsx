@@ -121,7 +121,7 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
                             <CardContent>
                                 <div className='flex flex-col gap-4'>
                                     <FormFieldInput control={form.control} name="stock" label="Stock" type="number" required />
-                                    <FormFieldInput control={form.control} name="price" label="Price" type="number" required />
+                                    <FormFieldInput control={form.control} name="price" label="Price" type="price" required />
                                     <FormFieldInput control={form.control} name="weight" label="Weight" type="number" required />
                                 </div>
                             </CardContent>
