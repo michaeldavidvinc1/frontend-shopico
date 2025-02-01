@@ -4,6 +4,7 @@ export const API_URL = {
     CREATE_STORE: "/store/create",
     GET_STORE_BY_USER: (id: string) => `/store/list/${id}`,
     CREATE_PRODUCT: "/product/create",
+    GET_ALL_CATEGORY: "/get-all/category"
 }
 
 export const ROUTES = {

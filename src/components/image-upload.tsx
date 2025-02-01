@@ -10,11 +10,15 @@ import { Button } from './ui/button';
 interface ImageUploadProps {
   multiple?: boolean;
   onUpload: (files: File[]) => void;
+  grid: string;
+  title: string
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
   multiple = false,
   onUpload,
+  grid,
+  title
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Store preview URLs
@@ -89,7 +93,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className="w-full space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Image Upload</h3>
+        <h3 className="text-lg font-medium">{title}</h3>
         <p className="text-sm text-muted-foreground">
           Supported formats: JPG, PNG, GIF
         </p>
@@ -104,7 +108,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         id="fileInput"
       />
 
-      <div className="grid grid-cols-10 gap-4">
+      <div className={cn("grid gap-4", grid && grid)}>
         {/* Always show input label */}
         <label htmlFor="fileInput" className="col-span-1">
           <div
