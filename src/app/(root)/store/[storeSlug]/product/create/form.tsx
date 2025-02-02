@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useGetAllCategoryQuery } from '@/services/category.service';
 import FormFieldInput from '@/components/form-field-input';
 import Link from 'next/link';
+import SellerCreateProductSkeleton from '@/components/skeleton/SellerCreateProductSkeleton';
 
 
 interface CreateProductFormProps {
@@ -60,7 +61,21 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
 
     async function onSubmit(values: FormData) {
         try {
-            const res = await createProduct(values).unwrap();
+            const formData = new FormData();
+            formData.append("storeId", values.storeId);
+            formData.append("categoryId", values.categoryId);
+            formData.append("name", values.name);
+            formData.append("slug", values.slug);
+            formData.append("description", values.description || "");
+            formData.append("stock", values.stock.toString());
+            formData.append("price", values.price.toString());
+            formData.append("weight", values.weight !== undefined ? values.weight.toString() : "");
+
+            // Append semua file yang di-upload
+            values.image.forEach((file) => {
+                formData.append("image", file);
+            });
+            const res = await createProduct(formData).unwrap();
             if (res.success) {
                 const user = res.data;
                 router.push(ROUTES.PRODUCT_SELLER(storeSlug));
@@ -71,12 +86,12 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
     }
 
     if (getCategoryLoading) {
-        return <h1>Lagi loading...</h1>
+        return <SellerCreateProductSkeleton />
     }
 
     return (
         <Form {...form}>
-            <form className="mt-4 space-y-6" onSubmit={form.handleSubmit(onSubmit)} >
+            <form className="mt-4 space-y-6" onSubmit={form.handleSubmit(onSubmit)} encType='multipart/form-data' >
                 <div className="grid grid-cols-5 gap-4">
                     <div className="col-span-3 flex flex-col gap-4">
                         <FormField control={form.control} name="image" render={() => (
@@ -122,7 +137,7 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
                                 <div className='flex flex-col gap-4'>
                                     <FormFieldInput control={form.control} name="stock" label="Stock" type="number" required />
                                     <FormFieldInput control={form.control} name="price" label="Price" type="price" required />
-                                    <FormFieldInput control={form.control} name="weight" label="Weight" type="number" required />
+                                    <FormFieldInput control={form.control} name="weight" label="Weight" type="number" />
                                 </div>
                             </CardContent>
                         </Card>

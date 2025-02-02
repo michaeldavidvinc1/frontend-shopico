@@ -18,7 +18,7 @@ interface FormFieldInputProps {
 }
 
 const FormFieldInput: FC<FormFieldInputProps> = ({ control, name, label, required, type = 'text', options, disabled }) => {
-
+    const [isFocused, setIsFocused] = useState(false);
     return (
         <FormField control={control} name={name} render={({ field }) => (
             <FormItem>
@@ -42,19 +42,36 @@ const FormFieldInput: FC<FormFieldInputProps> = ({ control, name, label, require
                     ) : type === 'price' ? (
                         <Input
                             {...field}
-                            type="text" // Tetap pakai text biar bisa format manual
+                            type="text"
                             disabled={disabled}
                             value={field.value ? field.value.toLocaleString("id-ID") : "0"}
                             onChange={(e) =>
                                 field.onChange(type === "price" ? Number(e.target.value.replace(/\D/g, "")) || 0 : e.target.value)
                             }
                         />
+                    ) : type === 'text' ? (
+                        <Input {...field} disabled={disabled} type="text" />
                     ) : (
                         <Input
                             {...field}
-                            type={type}
+                            type="number"
                             disabled={disabled}
-                            onChange={(e) => field.onChange(type === 'number' ? Number(e.target.value) || 0 : e.target.value)}
+                            value={isFocused && field.value === 0 ? "" : field.value.toString()}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => {
+                                setIsFocused(false);
+                                if (field.value === 0) {
+                                    field.onChange(0);
+                                }
+                            }}
+                            onChange={(e) => {
+                                let rawValue = e.target.value;
+                                if (rawValue === "") {
+                                    field.onChange(0);
+                                } else {
+                                    field.onChange(Number(rawValue));
+                                }
+                            }}
                         />
                     )}
                 </FormControl>

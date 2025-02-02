@@ -10,7 +10,13 @@ export const productApi = apiSlice.injectEndpoints({
                body: credentials
             })
         }),
+        getAllProductByStore: builder.query({
+            query: (storeId: string) => ({
+                url: API_URL.GET_ALL_PRODUCT_BY_STORE(storeId),
+               method: "GET",
+            })
+        })
     })
 });
 
-export const {useCreateProductMutation} = productApi
+export const {useCreateProductMutation, useGetAllProductByStoreQuery} = productApi

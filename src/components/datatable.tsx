@@ -7,19 +7,16 @@ import {
     useReactTable,
     getPaginationRowModel,
     getSortedRowModel,
-    SortingState
+    SortingState,
+    ColumnDef // Import ColumnDef
 } from "@tanstack/react-table";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import {Button} from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
-type Column<T> = {
-    accessorKey: keyof T;
-    header: string;
-};
-
+// Updated DataTableProps to use ColumnDef
 type DataTableProps<T> = {
     data: T[];
-    columns: Column<T>[];
+    columns: ColumnDef<T>[];
 };
 
 const Datatable = <T extends object>({ data, columns }: DataTableProps<T>) => {
@@ -35,6 +32,7 @@ const Datatable = <T extends object>({ data, columns }: DataTableProps<T>) => {
             sorting,
         },
     });
+
     return (
         <>
             <div className="rounded-md border">
@@ -51,10 +49,9 @@ const Datatable = <T extends object>({ data, columns }: DataTableProps<T>) => {
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
+                                                      header.column.columnDef.header,
+                                                      header.getContext()
+                                                  )}
                                         </TableHead>
                                     );
                                 })}
@@ -63,32 +60,41 @@ const Datatable = <T extends object>({ data, columns }: DataTableProps<T>) => {
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => {
-                                return (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={
-                                            row.getIsSelected() && "selected"
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                    className="text-center"
+                                >
+                                    {row.getVisibleCells().map((cell) => {
+                                        const cellValue = flexRender(
+                                            cell.column.columnDef.cell,
+                                            cell.getContext()
+                                        );
+                                        // Check if the value is an array (like for image URLs)
+                                        if (Array.isArray(cellValue)) {
+                                            // If the value is an array, just render its contents (e.g., image URLs)
+                                            return (
+                                                <TableCell key={cell.id}>
+                                                    {cellValue.map((item: any, index: number) => (
+                                                        <div key={index}>
+                                                            <img
+                                                                src={item.url}
+                                                                alt={`Image ${index + 1}`}
+                                                                className="w-16 h-16 object-cover"
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </TableCell>
+                                            );
                                         }
-                                        className={`text-center`}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                );
-                            })
+                                        return <TableCell key={cell.id}>{cellValue}</TableCell>;
+                                    })}
+                                </TableRow>
+                            ))
                         ) : (
                             <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No results.
                                 </TableCell>
                             </TableRow>

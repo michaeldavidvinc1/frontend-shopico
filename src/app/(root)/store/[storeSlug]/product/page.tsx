@@ -1,23 +1,33 @@
+"use client"
+
 import { DynamicBreadcrumb } from "@/components/breadcrumb-dynamis";
+import Datatable from "@/components/datatable";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ROUTES } from "@/constant";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { columns } from "./column";
+import { useGetAllProductByStoreQuery } from "@/services/product.service";
+import { use } from "react";
+import { ApiProduct } from "@/interface";
+import TableSkeleton from "@/components/skeleton/TableSkeleton";
 
-const ProductSeller = async ({ params }: { params: { storeSlug: string } }) => {
-    const { storeSlug } = await params;
+const ProductSeller = ({ params }:{ params: Promise<{ storeSlug: string }> }) => {
+    const { storeSlug } = use(params);
+    const {data: allProduct, isLoading: productLoading} = useGetAllProductByStoreQuery(storeSlug);
     const breadcrumbItems = [
         { label: "Dashboard", href: ROUTES.DASHBOARD_STORE(storeSlug) },
         { label: "Product" },
     ];
-
+    console.log(allProduct)
     return (
         <div className="space-y-6 flex flex-col gap-3">
             <div className="space-y-1">
                 <div className="flex flex-col gap-4">
-                    <h1 className="text-3xl font-bold tracking-tight">Products <span className="text-muted-foreground">(50)</span></h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Products <span className="text-muted-foreground">({allProduct ? allProduct?.data?.data?.length: 0})</span></h1>
                     <DynamicBreadcrumb items={breadcrumbItems} />
                 </div>
             </div>
@@ -56,6 +66,15 @@ const ProductSeller = async ({ params }: { params: { storeSlug: string } }) => {
                     </button>
                 </div>
             </div>
+            <Card>
+                <CardContent className="pt-6">
+                    {productLoading ? (
+                        <TableSkeleton rows={5} />
+                    ) : (
+                        <Datatable columns={columns} data={allProduct?.data.data || []} />
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 };
