@@ -2,9 +2,8 @@
 
 import React, { FC, useEffect, useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { CreateProductSellerSchema } from '@/schema';
-import { useCreateProductMutation } from '@/services/product.service';
+import { useCreateProductMutation, useGetAllProductByStoreQuery } from '@/services/product.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -15,13 +14,10 @@ import ImageUpload from '@/components/image-upload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { generateSlug } from '@/utils/slugify';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetAllCategoryQuery } from '@/services/category.service';
 import FormFieldInput from '@/components/form-field-input';
 import Link from 'next/link';
 import SellerCreateProductSkeleton from '@/components/skeleton/SellerCreateProductSkeleton';
-
 
 interface CreateProductFormProps {
     storeSlug: string
@@ -30,7 +26,8 @@ interface CreateProductFormProps {
 const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
 
     const router = useRouter();
-    const [createProduct, { isLoading }] = useCreateProductMutation();
+    const [createProduct, { isLoading: loadingCreateProduct }] = useCreateProductMutation();
+    const { refetch: refetchProducts } = useGetAllProductByStoreQuery(storeSlug);
     const [uploadedImages, setUploadedImages] = useState<File[]>([]);
     type FormData = z.infer<typeof CreateProductSellerSchema>
     const form = useForm<FormData>({
@@ -71,23 +68,31 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
             formData.append("price", values.price.toString());
             formData.append("weight", values.weight !== undefined ? values.weight.toString() : "");
 
-            // Append semua file yang di-upload
             values.image.forEach((file) => {
                 formData.append("image", file);
             });
             const res = await createProduct(formData).unwrap();
             if (res.success) {
-                const user = res.data;
+                await refetchProducts();
                 router.push(ROUTES.PRODUCT_SELLER(storeSlug));
             }
-        } catch (error: any) {
-            toast.error(error.data.msg)
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else if (typeof error === "object" && error !== null && "data" in error) {
+                const apiError = error as { data: { msg: string } };
+                toast.error(apiError.data.msg);
+            } else {
+                toast.error("An unknown error occurred");
+            }
         }
     }
 
     if (getCategoryLoading) {
         return <SellerCreateProductSkeleton />
     }
+
+    console.log(dataCategory)
 
     return (
         <Form {...form}>
@@ -152,6 +157,7 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
                     </Button>
                     <Button
                         type="submit"
+                        disabled={loadingCreateProduct}
                     >
                         Submit
                     </Button>

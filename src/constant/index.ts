@@ -5,7 +5,9 @@ export const API_URL = {
     GET_STORE_BY_USER: (id: string) => `/store/list/${id}`,
     CREATE_PRODUCT: "/product/create",
     GET_ALL_PRODUCT_BY_STORE: (storeId: string) => `/product/${storeId}`,
-    GET_ALL_CATEGORY: "/get-all/category"
+    GET_ALL_CATEGORY: "/get-all/category",
+    GET_SINGLE_PRODUCT: (productId: string) => `/product/${productId}/get-single`,
+    UPDATE_PRODUCT: (productId: string) => `/product/${productId}`
 }
 
 export const ROUTES = {
@@ -15,4 +17,5 @@ export const ROUTES = {
     DASHBOARD_STORE: (slug: string) => `/store/${slug}`,
     PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product`,
     CREATE_PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product/create`,
+    EDIT_PRODUCT_SELLER: (slug: string, productSlug: string) =>  `/store/${slug}/product/${productSlug}/edit`,
 }

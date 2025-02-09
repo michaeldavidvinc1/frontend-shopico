@@ -2,11 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import SearchInput from './search-input'
 import { Barcode, Headset, Heart, ShoppingBag, User } from 'lucide-react'
 import BecomeSeller from './become-seller'
-import { useSession } from "next-auth/react";
 import { ROUTES } from "@/constant";
 import { useGetStoreByUserQuery } from "@/services/store.service";
 import { Session } from "next-auth";
@@ -19,7 +18,7 @@ interface HeaderPageProps {
 
 export default function HeaderPage({ session, status }: HeaderPageProps) {
     const { data, isLoading: isStoreLoading } = useGetStoreByUserQuery(
-        session?.user?.id,
+        session?.user?.id as string,
         {
             skip: !session?.user?.id,
         }

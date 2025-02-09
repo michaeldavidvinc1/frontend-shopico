@@ -45,8 +45,15 @@ const BecomeSeller = () => {
                 toast.success(res.message);
                 router.push(ROUTES.DASHBOARD_STORE(res.data.slug));
             }
-        } catch (error: any) {
-            toast.error(error.data.msg)
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else if (typeof error === "object" && error !== null && "data" in error) {
+                const apiError = error as { data: { msg: string } };
+                toast.error(apiError.data.msg);
+            } else {
+                toast.error("An unknown error occurred");
+            }
         }
     }
     return (

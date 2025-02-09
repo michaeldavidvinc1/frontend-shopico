@@ -11,18 +11,18 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { columns } from "./column";
 import { useGetAllProductByStoreQuery } from "@/services/product.service";
-import { use } from "react";
-import { ApiProduct } from "@/interface";
+import { use, useMemo } from "react";
 import TableSkeleton from "@/components/skeleton/TableSkeleton";
+import { Product } from "@/interface/product";
 
 const ProductSeller = ({ params }:{ params: Promise<{ storeSlug: string }> }) => {
     const { storeSlug } = use(params);
     const {data: allProduct, isLoading: productLoading} = useGetAllProductByStoreQuery(storeSlug);
+    const product: Product[] = useMemo(() => allProduct?.data?.data || [], [allProduct]);
     const breadcrumbItems = [
         { label: "Dashboard", href: ROUTES.DASHBOARD_STORE(storeSlug) },
         { label: "Product" },
     ];
-    console.log(allProduct)
     return (
         <div className="space-y-6 flex flex-col gap-3">
             <div className="space-y-1">
@@ -71,7 +71,7 @@ const ProductSeller = ({ params }:{ params: Promise<{ storeSlug: string }> }) =>
                     {productLoading ? (
                         <TableSkeleton rows={5} />
                     ) : (
-                        <Datatable columns={columns} data={allProduct?.data.data || []} />
+                        <Datatable columns={columns} data={product} />
                     )}
                 </CardContent>
             </Card>

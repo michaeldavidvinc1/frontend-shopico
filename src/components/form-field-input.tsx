@@ -1,11 +1,10 @@
 "use client";
 
-import React, { FC, useState } from 'react'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form'
-import { Input } from './ui/input'
-import { Textarea } from './ui/textarea'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select'
-import { formatRupiah } from '@/utils/format-rupiah'
+import React, { FC, useState } from 'react';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
 
 interface FormFieldInputProps {
     control: any;
@@ -19,6 +18,13 @@ interface FormFieldInputProps {
 
 const FormFieldInput: FC<FormFieldInputProps> = ({ control, name, label, required, type = 'text', options, disabled }) => {
     const [isFocused, setIsFocused] = useState(false);
+
+    // Helper function to handle number input changes
+    const handleNumberChange = (value: string) => {
+        const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
+        return numericValue === "" ? 0 : Number(numericValue);
+    };
+
     return (
         <FormField control={control} name={name} render={({ field }) => (
             <FormItem>
@@ -27,13 +33,19 @@ const FormFieldInput: FC<FormFieldInputProps> = ({ control, name, label, require
                     {type === 'textarea' ? (
                         <Textarea {...field} disabled={disabled} />
                     ) : type === 'select' ? (
-                        <Select disabled={disabled} onValueChange={field.onChange} value={field.value}>
+                        <Select
+                            disabled={disabled}
+                            onValueChange={(value) => field.onChange(value)}
+                            value={String(field.value || '')} // Handle potential null/undefined values
+                        >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select an option" />
+                                <SelectValue placeholder="Select an option">
+                                    {options?.find(opt => String(opt.value) === String(field.value))?.label || "Select"} {/* Display placeholder if no option is selected */}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {options?.map((option) => (
-                                    <SelectItem key={option.value} value={String(option.value)}>
+                                    <SelectItem key={String(option.value)} value={String(option.value)}>
                                         {option.label}
                                     </SelectItem>
                                 ))}
@@ -44,41 +56,27 @@ const FormFieldInput: FC<FormFieldInputProps> = ({ control, name, label, require
                             {...field}
                             type="text"
                             disabled={disabled}
-                            value={field.value ? field.value.toLocaleString("id-ID") : "0"}
-                            onChange={(e) =>
-                                field.onChange(type === "price" ? Number(e.target.value.replace(/\D/g, "")) || 0 : e.target.value)
-                            }
+                            value={field.value ? Number(field.value).toLocaleString("id-ID") : "0"}
+                            onChange={(e) => field.onChange(handleNumberChange(e.target.value))}
                         />
                     ) : type === 'text' ? (
                         <Input {...field} disabled={disabled} type="text" />
                     ) : (
                         <Input
                             {...field}
-                            type="number"
+                            type="text" // Use text type for number input to avoid browser validation issues
                             disabled={disabled}
-                            value={isFocused && field.value === 0 ? "" : field.value.toString()}
+                            value={field.value !== 0 ? String(field.value || "") : ""} // Display empty string if value is 0 and not focused
                             onFocus={() => setIsFocused(true)}
-                            onBlur={() => {
-                                setIsFocused(false);
-                                if (field.value === 0) {
-                                    field.onChange(0);
-                                }
-                            }}
-                            onChange={(e) => {
-                                let rawValue = e.target.value;
-                                if (rawValue === "") {
-                                    field.onChange(0);
-                                } else {
-                                    field.onChange(Number(rawValue));
-                                }
-                            }}
+                            onBlur={() => setIsFocused(false)}
+                            onChange={(e) => field.onChange(handleNumberChange(e.target.value))}
                         />
                     )}
                 </FormControl>
                 <FormMessage />
             </FormItem>
         )} />
-    )
-}
+    );
+};
 
-export default FormFieldInput
+export default FormFieldInput;

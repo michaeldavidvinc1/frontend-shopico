@@ -28,3 +28,20 @@ export const CreateProductSellerSchema = z.object({
     weight: z.number().optional(),
     image: z.array(z.instanceof(File)).min(1, "At least one image is required")
 })
+
+export const ImageSchema = z.object({
+    url: z.string().url().optional(), 
+    file: z.instanceof(File).optional(), 
+  });
+  
+  export const EditProductSellerSchema = z.object({
+    storeId: z.string().min(1),
+    categoryId: z.string().min(1),
+    name: z.string().min(1),
+    slug: z.string().min(1),
+    description: z.string().optional(),
+    stock: z.number().min(0),
+    price: z.number().min(0),
+    weight: z.number().optional(),
+    image: z.array(ImageSchema).optional(),
+  });
