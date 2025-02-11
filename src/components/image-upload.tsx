@@ -70,7 +70,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ multiple = false, onUpload, o
         });
 
         if (onRemove) {
-            onRemove(index); // Panggil prop onRemove kalau ada
+            onRemove(index); 
         }
     };
 
