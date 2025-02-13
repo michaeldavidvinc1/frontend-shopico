@@ -92,8 +92,6 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
         return <SellerCreateProductSkeleton />
     }
 
-    console.log(dataCategory)
-
     return (
         <Form {...form}>
             <form className="mt-4 space-y-6" onSubmit={form.handleSubmit(onSubmit)} encType='multipart/form-data' >
@@ -150,7 +148,7 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
                 </div>
                 {/* Submit Button */}
                 <div className='flex justify-end gap-4'>
-                    <Button variant="ghost">
+                    <Button variant="ghost" type="button">
                         <Link href={ROUTES.PRODUCT_SELLER(storeSlug)}>
                             Cancel
                         </Link>

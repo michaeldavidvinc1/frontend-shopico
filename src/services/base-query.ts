@@ -1,4 +1,4 @@
-import {EndpointBuilder, fetchBaseQuery} from '@reduxjs/toolkit/query'
+import {fetchBaseQuery} from '@reduxjs/toolkit/query'
 import {createApi} from '@reduxjs/toolkit/query/react'
 import {getSession} from "next-auth/react";
 const baseQuery = fetchBaseQuery({
@@ -15,6 +15,7 @@ const baseQuery = fetchBaseQuery({
 
 export const apiSlice = createApi({
     baseQuery: baseQuery,
+    tagTypes: ['Product'],
     endpoints: () => ({})
 });
 

@@ -7,22 +7,22 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { toast } from "sonner";
-
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ImageUpload from "@/components/image-upload";
 import SellerCreateProductSkeleton from "@/components/skeleton/SellerCreateProductSkeleton";
 import FormFieldInput from "@/components/form-field-input";
-
 import { EditProductSellerSchema } from "@/schema";
-import { useGetSingleProductQuery, useUpdateProductMutation } from "@/services/product.service";
+import {
+    useGetAllProductByStoreQuery,
+    useGetSingleProductQuery,
+    useUpdateProductMutation
+} from "@/services/product.service";
 import { useGetAllCategoryQuery } from "@/services/category.service";
 import { generateSlug } from "@/utils/slugify";
 import { ROUTES } from "@/constant";
-
 import { Category } from "@/interface/category";
-import ImageUploadInput from "@/components/imageUpload";
 
 interface EditProductFormProps {
     storeSlug: string;
@@ -38,7 +38,10 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
     const router = useRouter();
     const [updateProduct, { isLoading }] = useUpdateProductMutation();
     const { data: dataProduct, isLoading: loadDataProduct } = useGetSingleProductQuery(productSlug);
-    const { data: dataCategory, isLoading: getCategoryLoading } = useGetAllCategoryQuery({});
+    const { refetch: refetchProducts } = useGetAllProductByStoreQuery(storeSlug);
+    const { data: dataCategory, isLoading: getCategoryLoading } = useGetAllCategoryQuery({}, {
+        refetchOnMountOrArgChange: true,
+    });
     const [uploadedImages, setUploadedImages] = useState<ImageData[]>([]);
 
     type FormData = z.infer<typeof EditProductSellerSchema>;
@@ -127,11 +130,18 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
 
             if (res.success) {
                 toast.success("Product updated successfully!");
+                await refetchProducts();
                 router.push(ROUTES.PRODUCT_SELLER(storeSlug));
             }
-        } catch (error: any) {
-            const errorMessage = error?.data?.msg || error?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else if (typeof error === "object" && error !== null && "data" in error) {
+                const apiError = error as { data: { msg: string } };
+                toast.error(apiError.data.msg);
+            } else {
+                toast.error("An unknown error occurred");
+            }
         }
     }
 
@@ -198,7 +208,7 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
                 {/* Submit Buttons */}
                 <div className="flex justify-end gap-4">
                     <Link href={ROUTES.PRODUCT_SELLER(storeSlug)}>
-                        <Button variant="ghost">Cancel</Button>
+                        <Button variant="ghost" type="button">Cancel</Button>
                     </Link>
                     <Button type="submit" disabled={isLoading}>
                         Update

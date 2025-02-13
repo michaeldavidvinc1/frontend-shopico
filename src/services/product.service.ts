@@ -10,12 +10,14 @@ export const productApi = apiSlice.injectEndpoints({
                method: "POST",
                body: payload
             }),
+            invalidatesTags: ['Product']
         }),
         getAllProductByStore: builder.query({
             query: (storeId: string) => ({
                 url: API_URL.GET_ALL_PRODUCT_BY_STORE(storeId),
                method: "GET",
             }),
+            providesTags: ['Product']
         }),
         getSingleProduct: builder.query({
             query: (productId: string) => ({
