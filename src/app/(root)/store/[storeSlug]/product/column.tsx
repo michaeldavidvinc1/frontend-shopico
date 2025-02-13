@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ROUTES } from "@/constant";
 import { Product } from "@/interface/product";
+import { useDeleteProductMutation, useGetAllProductByStoreQuery } from "@/services/product.service";
 import { formatRupiah } from "@/utils/format-rupiah";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { ArrowUpDown, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2"
 
 export const columns: ColumnDef<Product>[] = [
     {
         accessorKey: "no",
-        header: ({column} ) => {
+        header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
@@ -46,7 +48,7 @@ export const columns: ColumnDef<Product>[] = [
         cell: ({ row }: { row: Row<Product> }) => {
             const name = row.getValue<string>("name");
             const image = row.original.image?.[0]?.url;
-            
+
             return (
                 <div className="flex items-center space-x-2">
                     {image && <img src={image} alt={name} className="w-10 h-10 rounded-md object-cover" />}
@@ -68,7 +70,7 @@ export const columns: ColumnDef<Product>[] = [
         header: "Price",
         cell: ({ row }: { row: Row<Product> }) => {
             const price = row.getValue<number>("price");
-            
+
             return formatRupiah.format(price)
         }
     },
@@ -77,8 +79,8 @@ export const columns: ColumnDef<Product>[] = [
         header: "Status",
         cell: ({ row }: { row: Row<Product> }) => {
             const status = row.getValue<string>("status");
-            
-            return <Badge variant={status === 'ACTIVE' ? 'active' : 'destructive'} className="capitalize">{status.toLowerCase()}</Badge> 
+
+            return <Badge variant={status === 'ACTIVE' ? 'active' : 'destructive'} className="capitalize">{status.toLowerCase()}</Badge>
         }
     },
     {
@@ -86,26 +88,33 @@ export const columns: ColumnDef<Product>[] = [
         cell: ({ row }: { row: Row<Product> }) => {
             const dataRow = row.original;
             const router = useRouter();
+            const [deleteProduct, { isLoading: loadingDeleteProduct }] = useDeleteProductMutation();
+            const { refetch: refetchProducts } = useGetAllProductByStoreQuery(dataRow.storeId);
 
             const handleEdit = (slug: string) => {
                 router.push(ROUTES.EDIT_PRODUCT_SELLER(dataRow.storeId, slug))
             }
 
-            // const handleDelete = (id) => {
-            //     Swal.fire({
-            //         title: "Are you sure?",
-            //         text: "You cannot undo this data again!",
-            //         icon: "warning",
-            //         showCancelButton: true,
-            //         confirmButtonColor: "#3085d6",
-            //         cancelButtonColor: "#d33",
-            //         confirmButtonText: "Iya, Hapus",
-            //         cancelButtonText: "Batal",
-            //     }).then(async (result) => {
-            //         if (result.isConfirmed) {
-            //         }
-            //     });
-            // };
+            const handleDelete = (id: string) => {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You cannot undo this data again!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Iya, Hapus",
+                    cancelButtonText: "Batal",
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const res = await deleteProduct(id).unwrap();
+                        if (res.success) {
+                            await refetchProducts();
+                            router.push(ROUTES.PRODUCT_SELLER(dataRow.storeId));
+                        }
+                    }
+                });
+            };
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -127,7 +136,7 @@ export const columns: ColumnDef<Product>[] = [
                         <DropdownMenuItem>
                             <span
                                 className=" flex gap-2 items-center cursor-pointer text-red-500"
-                                // onClick={() => handleDelete(dataRow.id)}
+                                onClick={() => handleDelete(dataRow.slug)}
                             >
                                 <Trash2 className="w-4" /> Delete
                             </span>

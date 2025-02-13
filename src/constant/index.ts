@@ -7,7 +7,8 @@ export const API_URL = {
     GET_ALL_PRODUCT_BY_STORE: (storeId: string) => `/product/${storeId}`,
     GET_ALL_CATEGORY: "/get-all/category",
     GET_SINGLE_PRODUCT: (productId: string) => `/product/${productId}/get-single`,
-    UPDATE_PRODUCT: (productId: string) => `/product/${productId}`
+    UPDATE_PRODUCT: (productId: string) => `/product/${productId}`,
+    DELETE_PRODUCT: (productId: string) => `/product/${productId}`,
 }
 
 export const ROUTES = {
