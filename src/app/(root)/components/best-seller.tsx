@@ -1,111 +1,43 @@
 "use client";
 
 import ProductCard from '@/components/product-card';
-import React from 'react'
+import ProductCardSkeleton from '@/components/skeleton/ProductCardSkeleton';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Product } from '@/interface/product';
+import React, { FC } from 'react'
 import { Swiper, SwiperSlide } from "swiper/react";
 
+interface BestSellerProps {
+    data: Product[],
+    isLoading: boolean
+}
 
-const product = [
-    {
-        'name': 'title 1',
-        'category': 'category 1',
-        'harga': 100,
-        'image': '/image/image1.jpg',
-        'rating': 1.56
-    },
-    {
-        'name': 'title 2',
-        'category': 'category 2',
-        'harga': 200,
-        'image': '/image/image1.jpg',
-        'rating': 4.26
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-    {
-        'name': 'title 3',
-        'category': 'category 3',
-        'harga': 300,
-        'image': '/image/image1.jpg',
-        'rating': 4.90
-    },
-]
-
-const BestSeller = () => {
+const BestSeller: FC<BestSellerProps> = ({data, isLoading}) => {
     return (
         <div className="mx-auto px-4 md:px-20 lg:px-24 py-8">
             <p className="font-bold text-2xl">Best Seller</p>
             <div className="flex mt-6">
                 <Swiper
                     slidesPerView={5}>
-                    {product.map((item, index) => (
-                        <SwiperSlide key={index}>
-                            <ProductCard
-                                key={index}
-                                name={item.name}
-                                category={item.category}
-                                harga={item.harga}
-                                image={item.image}
-                                rating={item.rating}
-                            />
-                        </SwiperSlide>
-                    ))}
+                    {isLoading
+                        ? Array.from({ length: 5 }).map((_, index) => (
+                            <SwiperSlide key={index}>
+                                <ProductCardSkeleton />
+                            </SwiperSlide>
+                        ))
+                        : data.map((item: Product, index) => (
+                            <SwiperSlide key={index}>
+                                <ProductCard
+                                    key={index}
+                                    name={item.name}
+                                    category={item.category.name}
+                                    harga={item.price}
+                                    image={item.image[0].url}
+                                    rating={3}
+                                />
+                            </SwiperSlide>
+                        ))}
                 </Swiper>
-
             </div>
         </div>
     )

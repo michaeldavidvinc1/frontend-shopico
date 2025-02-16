@@ -30,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ name, category, harga, image,
                 <img
                     src={image}
                     alt={name}
-                    className="w-42 h-42 object-contain"
+                    className="w-full h-48 object-cover rounded-md"
                 />
             </div>
 
