@@ -9,6 +9,7 @@ export const API_URL = {
     GET_SINGLE_PRODUCT: (productId: string) => `/product/${productId}/get-single`,
     UPDATE_PRODUCT: (productId: string) => `/product/${productId}`,
     DELETE_PRODUCT: (productId: string) => `/product/${productId}`,
+    GET_HOME_DATA: "/get-data/home"
 }
 
 export const ROUTES = {

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  react-app:
+    image: node:20.12
+    container_name: shopico-frontend
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: ["sh", "-c", "npm install --legacy-peer-deps && npm run dev"]
