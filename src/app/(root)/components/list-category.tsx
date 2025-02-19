@@ -31,9 +31,17 @@ const ListCategory: FC<ListCategoryProps> = ({data, isLoading}) => {
                     ))
                     : data.map((item: Category, index) => (
                         <SwiperSlide key={index}>
-                            <Link href="/" className='flex flex-col items-center'>
-                                <Image src={item.image.url} width={75} height={75} alt='category' />
-                                <p className='text-sm text-muted-foreground'>{item.name}</p>
+                            <Link href="/" className="flex flex-col items-center">
+                                <div className="w-[75px] h-[75px] relative">
+                                    <Image
+                                        src={item.image?.url ?? '/image/category-default.png'}
+                                        alt="category"
+                                        fill
+                                        sizes="(max-width: 768px) 50px, (max-width: 1200px) 75px, 75px"
+                                        className="rounded-md object-cover"
+                                    />
+                                </div>
+                                <p className="text-sm text-muted-foreground">{item.name}</p>
                             </Link>
                         </SwiperSlide>
                     ))}

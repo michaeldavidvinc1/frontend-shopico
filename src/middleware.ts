@@ -1,29 +1,36 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { ROUTES } from './constant';
-import {getToken} from "next-auth/jwt";
+import {API_URL, ROUTES} from './constant';
 import {signOut} from "next-auth/react";
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('next-auth.session-token')?.value;
-  const token1 = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-  if(token1){
-    const isExpired = token1?.exp < Math.floor(Date.now() / 1000)
-    if (isExpired) {
-      console.log('Token expired');
-
-      await signOut({
-        redirect: false,
+  const token = request.cookies.get('jwt')?.value;
+  console.log(token)
+  if (token) {
+    try {
+      const url = API_URL.VERIFY_TOKEN(token);
+      const response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+      const verify = await response.json();
 
-      return NextResponse.redirect(new URL(ROUTES.LOGIN, request.url));
+      console.log(verify);
+
+      // if (verify.success === false) {
+      //   await signOut({
+      //     redirect: false,
+      //   });
+      // }
+    } catch (error) {
+      console.error("Error verifying token:", error);
     }
   }
 
-  const protectedRoutes = ['/cart', '/store/:slug'];
+  const protectedRoutes = ['/store/:slug/*', '/'];
   const guestRoutes = [ROUTES.LOGIN, ROUTES.REGISTER];
 
   const isProtectedRoute = protectedRoutes.some(route => {
@@ -51,9 +58,9 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/cart',
     '/login',
     '/register',
-    '/store/:slug',
+    '/store/:slug*',
+    '/'
   ],
 };
