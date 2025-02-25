@@ -5,7 +5,7 @@ import { ROUTES } from '@/constant';
 import React from 'react'
 import EditProductForm from './form';
 
-const CreateProductSeller = async ({ params }: { params: { storeSlug: string, productSlug: string } }) => {
+const UpdateProductSeller = async ({ params }: { params: { storeSlug: string, productSlug: string } }) => {
     const { storeSlug, productSlug } = await params;
     const breadcrumbItems = [
         { label: "Dashboard", href: ROUTES.DASHBOARD_STORE(storeSlug) },
@@ -22,10 +22,10 @@ const CreateProductSeller = async ({ params }: { params: { storeSlug: string, pr
                 </div>
             </div>
             <div>
-                <EditProductForm storeSlug={storeSlug} productSlug={productSlug} />
+                <EditProductForm storeSlug={storeSlug} productSlug={productSlug} key={productSlug} />
             </div>
         </div>
     )
 }
 
-export default CreateProductSeller
+export default UpdateProductSeller

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ImageUpload from "@/components/image-upload";
@@ -23,6 +23,7 @@ import { useGetAllCategoryQuery } from "@/services/category.service";
 import { generateSlug } from "@/utils/slugify";
 import { ROUTES } from "@/constant";
 import { Category } from "@/interface/category";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EditProductFormProps {
     storeSlug: string;
@@ -37,15 +38,16 @@ interface ImageData {
 const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) => {
     const router = useRouter();
     const [updateProduct, { isLoading }] = useUpdateProductMutation();
-    const { data: dataProduct, isLoading: loadDataProduct } = useGetSingleProductQuery(productSlug);
-    const { refetch: refetchProducts } = useGetAllProductByStoreQuery(storeSlug);
+    const { data: dataProduct, isLoading: loadDataProduct } = useGetSingleProductQuery(productSlug, {
+        skip: !productSlug,
+    });
+    const { refetch: refetchProducts } = useGetAllProductByStoreQuery({storeId: storeSlug});
     const { data: dataCategory, isLoading: getCategoryLoading } = useGetAllCategoryQuery({}, {
         refetchOnMountOrArgChange: true,
     });
     const [uploadedImages, setUploadedImages] = useState<string[]>([]);
     const [deleteImages, setDeleteImages] = useState<string[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-
     type FormData = z.infer<typeof EditProductSellerSchema>;
 
     const form = useForm<FormData>({
@@ -64,25 +66,33 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
     });
 
     useEffect(() => {
-        if (dataProduct?.data) {
+        if (dataProduct?.data?.category && dataCategory?.data) {
             const product = dataProduct.data;
-            form.setValue("categoryId", product.category.slug);
-            form.setValue("name", product.name);
-            form.setValue("slug", product.slug);
-            form.setValue("description", product.description);
-            form.setValue("stock", product.stock);
-            form.setValue("price", product.price);
-            form.setValue("weight", product.weight ?? 0);
-
+            form.reset({
+                storeId: storeSlug,
+                categoryId: product.category?.slug, // Isi categoryId di sini
+                name: product.name,
+                slug: product.slug,
+                description: product.description,
+                stock: product.stock,
+                price: product.price,
+                weight: product.weight || 0,
+                image: [],
+            });
+    
             const initialImages = product.image?.map(({ url }: { url: string }) => url) || [];
-            form.setValue("image", initialImages);
-            setUploadedImages((prevImages) => [...prevImages, ...initialImages]);
+            setUploadedImages(initialImages);
+            setUploadedFiles([]);
         }
-    }, [dataProduct, form]);
+    }, [dataProduct, dataCategory]);
 
     useEffect(() => {
-        const slug = generateSlug(form.watch("name"));
-        form.setValue("slug", slug, { shouldValidate: true });
+        const timeout = setTimeout(() => {
+            const slug = generateSlug(form.getValues("name"));
+            form.setValue("slug", slug, { shouldValidate: true });
+        }, 300);
+
+        return () => clearTimeout(timeout);
     }, [form.watch("name")]);
 
     // Handle Image Upload
@@ -100,7 +110,6 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
     const handleRemoveImage = (index: number) => {
         // Ambil dulu gambar yang akan dihapus sebelum mengubah state
         const removedImage = uploadedImages[index];
-
         // Masukkan ke deleteImages hanya jika berupa URL (string)
         if (typeof removedImage === "string" && !removedImage.startsWith("blob:")) {
             setDeleteImages((prevFiles) => [...prevFiles, removedImage]);
@@ -117,7 +126,6 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
         form.setValue("image", newFiles, { shouldValidate: true });
     };
 
-
     async function onSubmit(values: FormData) {
         try {
             const formData = new FormData();
@@ -130,8 +138,8 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
             formData.append("price", values.price.toString());
             formData.append("weight", values.weight ? values.weight.toString() : "0");
 
-            console.log("uploadedFiles:", uploadedFiles);
-            console.log("deleteImages:", deleteImages);
+            // console.log("uploadedFiles:", uploadedFiles);
+            // console.log("deleteImages:", deleteImages);
 
             uploadedFiles.forEach((file) => {
                 formData.append("image", file);
@@ -140,17 +148,17 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
             deleteImages.forEach((file) => {
                 formData.append("delete_image", file);
             });
-            console.log("Submitting:", Object.fromEntries(formData.entries()));
-            console.log("uploadedImages:", uploadedImages);
-            console.log("Values:", values);
+            // console.log("Submitting:", Object.fromEntries(formData.entries()));
+            // console.log("uploadedImages:", uploadedImages);
+            // console.log("Values:", values);
 
-            // const res = await updateProduct({ payload: formData, productId: productSlug }).unwrap();
+            const res = await updateProduct({ payload: formData, productId: productSlug }).unwrap();
 
-            // if (res.success) {
-            //     toast.success("Product updated successfully!");
-            //     await refetchProducts();
-            //     router.push(ROUTES.PRODUCT_SELLER(storeSlug));
-            // }
+            if (res.success) {
+                toast.success("Product updated successfully!");
+                await refetchProducts();
+                router.push(ROUTES.PRODUCT_SELLER(storeSlug));
+            }
         } catch (error: unknown) {
             if (error instanceof Error) {
                 toast.error(error.message);
@@ -197,14 +205,37 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
                             <CardContent className="grid grid-cols-2 gap-4">
                                 <FormFieldInput control={form.control} name="name" label="Product Name" type="text" required />
                                 <FormFieldInput control={form.control} name="slug" label="Product Slug" type="text" required disabled />
-                                <FormFieldInput
+                                <FormField
+                                    control={form.control}
+                                    name="categoryId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Category Name</FormLabel>
+                                            <FormControl>
+                                                <Select value={field.value}
+                    onValueChange={field.onChange}>
+                                                    <SelectTrigger className="w-[180px]">
+                                                        <SelectValue placeholder="Category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {dataCategory?.data?.map((item: Category) => (
+                                                            <SelectItem value={item.slug} key={item.id}>{item.name}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                {/* <FormFieldInput
                                     control={form.control}
                                     name="categoryId"
                                     label="Category"
                                     type="select"
                                     required
                                     options={dataCategory?.data?.map((item: Category) => ({ label: item.name, value: item.slug }))}
-                                />
+                                /> */}
                                 <FormFieldInput control={form.control} name="description" label="Description" type="textarea" />
                             </CardContent>
                         </Card>

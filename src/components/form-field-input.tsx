@@ -36,19 +36,26 @@ const FormFieldInput: FC<FormFieldInputProps> = ({ control, name, label, require
                         <Select
                             disabled={disabled}
                             onValueChange={(value) => field.onChange(value)}
-                            value={String(field.value || '')} // Handle potential null/undefined values
+                            value={String(field.value || '')} // Handle null/undefined
+                            defaultValue={String(field.value || '')} // Set default value
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select an option">
-                                    {options?.find(opt => String(opt.value) === String(field.value))?.label || "Select"} {/* Display placeholder if no option is selected */}
+                                    {options?.find((opt) => String(opt.value) === String(field.value))?.label || "Select"}
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                {options?.map((option) => (
-                                    <SelectItem key={String(option.value)} value={String(option.value)}>
-                                        {option.label}
+                                {options ? (
+                                    options.map((option) => (
+                                        <SelectItem key={String(option.value)} value={String(option.value)}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))
+                                ) : (
+                                    <SelectItem value="" disabled>
+                                        Loading...
                                     </SelectItem>
-                                ))}
+                                )}
                             </SelectContent>
                         </Select>
                     ) : type === 'price' ? (

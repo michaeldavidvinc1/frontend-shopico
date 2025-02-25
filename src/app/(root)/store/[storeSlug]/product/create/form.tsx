@@ -91,7 +91,7 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
             uploadedFiles.forEach((file) => {
                 formData.append("image", file);
             });
-            console.log(Object.fromEntries(formData.entries()))
+            // console.log(Object.fromEntries(formData.entries()))
             const res = await createProduct(formData).unwrap();
             if (res.success) {
                 await refetchProducts();
