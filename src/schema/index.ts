@@ -1,47 +1,43 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const LoginSchema = z.object({
-    email: z.string().email().min(1),
-    password: z.string().min(5),
-})
+  email: z.string().email().min(1),
+  password: z.string().min(5),
+});
 
 export const RegisterSchema = z.object({
-    name: z.string().min(1),
-    email: z.string().email().min(1),
-    password: z.string().min(5),
-})
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+  password: z.string().min(5),
+});
 
 export const CreateStoreSchema = z.object({
-    userId: z.string(),
-    name: z.string().min(1),
-    slug: z.string(),
-})
+  userId: z.string(),
+  name: z.string().min(1),
+  slug: z.string(),
+});
 
 export const CreateProductSellerSchema = z.object({
-    storeId: z.string().min(1),
-    categoryId: z.string().min(1),
-    name: z.string().min(1),
-    slug: z.string().min(1),
-    description: z.string().optional(),
-    stock: z.number().min(1),
-    price: z.number().min(1),
-    weight: z.number().optional(),
-    image: z.array(z.instanceof(File)).min(1, "At least one image is required")
-})
+  storeId: z.string().min(1),
+  categoryId: z.string().min(1),
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().optional(),
+  stock: z.number().min(1),
+  price: z.number().min(1),
+  weight: z.number().optional(),
+  image: z.array(z.instanceof(File)).min(1, "At least one image is required"),
+});
 
-export const ImageSchema = z.object({
-    url: z.string().url().optional(), 
-    file: z.instanceof(File).optional(), 
-  });
-  
-  export const EditProductSellerSchema = z.object({
-    storeId: z.string().min(1),
-    categoryId: z.string().min(1),
-    name: z.string().min(1),
-    slug: z.string().min(1),
-    description: z.string().optional(),
-    stock: z.number().min(0),
-    price: z.number().min(0),
-    weight: z.number().optional(),
-    image: z.array(ImageSchema).optional(),
-  });
+
+export const EditProductSellerSchema = z.object({
+  storeId: z.string().min(1),
+  categoryId: z.string().min(1),
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().optional(),
+  stock: z.number().min(0),
+  price: z.number().min(0),
+  weight: z.number().optional(),
+  image: z.array(z.instanceof(File)).optional(),
+});

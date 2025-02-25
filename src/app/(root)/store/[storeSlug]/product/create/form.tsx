@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState } from 'react'
+import React, { ChangeEvent, FC, useEffect, useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CreateProductSellerSchema } from '@/schema';
 import { useCreateProductMutation, useGetAllProductByStoreQuery } from '@/services/product.service';
@@ -28,7 +28,8 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
     const router = useRouter();
     const [createProduct, { isLoading: loadingCreateProduct }] = useCreateProductMutation();
     const { refetch: refetchProducts } = useGetAllProductByStoreQuery(storeSlug);
-    const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     type FormData = z.infer<typeof CreateProductSellerSchema>
     const form = useForm<FormData>({
         resolver: zodResolver(CreateProductSellerSchema),
@@ -46,16 +47,35 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
     });
 
     const { data: dataCategory, isLoading: getCategoryLoading } = useGetAllCategoryQuery({});
+
+    // Handle name convert to slug
     const nameValue = form.watch("name");
     useEffect(() => {
         form.setValue("slug", generateSlug(nameValue));
     }, [nameValue]);
 
-    const handleImageUpload = (files: File[]) => {
-        setUploadedImages(files);
-        form.setValue("image", files);
+    // Handle Image Upload
+    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
+
+        const files = Array.from(e.target.files);
+        const imageUrls = files.map((file) => URL.createObjectURL(file));
+
+        setUploadedImages((prevImages) => [...prevImages, ...imageUrls]);
+        setUploadedFiles((prevFiles) => [...prevFiles, ...files]);
+        form.setValue("image", files, { shouldValidate: true });
     };
 
+    const handleRemoveImage = (index: number) => {
+
+        setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+        const newFiles = uploadedFiles.filter((_, i) => i !== index);
+        setUploadedFiles(newFiles);
+    
+        form.setValue("image", newFiles, { shouldValidate: true });
+    };
+
+    // Submit data 
     async function onSubmit(values: FormData) {
         try {
             const formData = new FormData();
@@ -68,9 +88,10 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
             formData.append("price", values.price.toString());
             formData.append("weight", values.weight !== undefined ? values.weight.toString() : "");
 
-            values.image.forEach((file) => {
+            uploadedFiles.forEach((file) => {
                 formData.append("image", file);
             });
+            console.log(Object.fromEntries(formData.entries()))
             const res = await createProduct(formData).unwrap();
             if (res.success) {
                 await refetchProducts();
@@ -102,9 +123,11 @@ const CreateProductForm: FC<CreateProductFormProps> = ({ storeSlug }) => {
                                 <FormControl>
                                     <ImageUpload
                                         multiple
-                                        onUpload={handleImageUpload}
                                         grid='grid-cols-5'
+                                        onRemove={handleRemoveImage}
+                                        onUpload={handleImageUpload}
                                         title="Product Image"
+                                        imagePreviews={uploadedImages}
                                     />
                                 </FormControl>
                                 <FormMessage />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -42,7 +42,9 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
     const { data: dataCategory, isLoading: getCategoryLoading } = useGetAllCategoryQuery({}, {
         refetchOnMountOrArgChange: true,
     });
-    const [uploadedImages, setUploadedImages] = useState<ImageData[]>([]);
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [deleteImages, setDeleteImages] = useState<string[]>([]);
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
     type FormData = z.infer<typeof EditProductSellerSchema>;
 
@@ -72,9 +74,9 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
             form.setValue("price", product.price);
             form.setValue("weight", product.weight ?? 0);
 
-            const initialImages = product.image?.map(({ url }: { url: string }) => ({ url })) || [];
+            const initialImages = product.image?.map(({ url }: { url: string }) => url) || [];
             form.setValue("image", initialImages);
-            setUploadedImages(initialImages);
+            setUploadedImages((prevImages) => [...prevImages, ...initialImages]);
         }
     }, [dataProduct, form]);
 
@@ -83,23 +85,39 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
         form.setValue("slug", slug, { shouldValidate: true });
     }, [form.watch("name")]);
 
-    const handleImageUpload = (files: File[]) => {
-        const newImages = files.map((file) => ({ file }));
-        const currentImages = uploadedImages.filter((img) => img.url);
-        const allImages = [...currentImages, ...newImages];
+    // Handle Image Upload
+    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
 
-        setUploadedImages(allImages);
-        form.setValue("image", allImages);
+        const files = Array.from(e.target.files);
+        const imageUrls = files.map((file) => URL.createObjectURL(file));
+
+        setUploadedImages((prevImages) => [...prevImages, ...imageUrls]);
+        setUploadedFiles((prevFiles) => [...prevFiles, ...files]);
+        form.setValue("image", files, { shouldValidate: true });
     };
 
-    const handleRemove = (index: number) => {
+    const handleRemoveImage = (index: number) => {
+        // Ambil dulu gambar yang akan dihapus sebelum mengubah state
+        const removedImage = uploadedImages[index];
+
+        // Masukkan ke deleteImages hanya jika berupa URL (string)
+        if (typeof removedImage === "string" && !removedImage.startsWith("blob:")) {
+            setDeleteImages((prevFiles) => [...prevFiles, removedImage]);
+        }
+
+        // Update state uploadedImages
         setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
-        form.setValue(
-            "image",
-            (form.getValues("image") ?? []).filter((_, i) => i !== index)
-        );
+
+        // Update state uploadedFiles
+        const newFiles = uploadedFiles.filter((_, i) => i !== index);
+        setUploadedFiles(newFiles);
+
+        // Update form value
+        form.setValue("image", newFiles, { shouldValidate: true });
     };
-    
+
+
     async function onSubmit(values: FormData) {
         try {
             const formData = new FormData();
@@ -112,27 +130,27 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
             formData.append("price", values.price.toString());
             formData.append("weight", values.weight ? values.weight.toString() : "0");
 
-            const currentImages: string[] = [];
-            const newImages: File[] = [];
+            console.log("uploadedFiles:", uploadedFiles);
+            console.log("deleteImages:", deleteImages);
 
-            values.image?.forEach((image) => {
-                if (image.url) {
-                    currentImages.push(image.url);
-                } else if (image.file) {
-                    newImages.push(image.file);
-                }
+            uploadedFiles.forEach((file) => {
+                formData.append("image", file);
             });
 
-            formData.append("current_images", JSON.stringify(currentImages));
-            newImages.forEach((file) => formData.append("image", file));
+            deleteImages.forEach((file) => {
+                formData.append("delete_image", file);
+            });
+            console.log("Submitting:", Object.fromEntries(formData.entries()));
+            console.log("uploadedImages:", uploadedImages);
+            console.log("Values:", values);
 
-            const res = await updateProduct({ payload: formData, productId: productSlug }).unwrap();
+            // const res = await updateProduct({ payload: formData, productId: productSlug }).unwrap();
 
-            if (res.success) {
-                toast.success("Product updated successfully!");
-                await refetchProducts();
-                router.push(ROUTES.PRODUCT_SELLER(storeSlug));
-            }
+            // if (res.success) {
+            //     toast.success("Product updated successfully!");
+            //     await refetchProducts();
+            //     router.push(ROUTES.PRODUCT_SELLER(storeSlug));
+            // }
         } catch (error: unknown) {
             if (error instanceof Error) {
                 toast.error(error.message);
@@ -163,11 +181,11 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
                                     <FormControl>
                                         <ImageUpload
                                             multiple
+                                            grid='grid-cols-5'
+                                            onRemove={handleRemoveImage}
                                             onUpload={handleImageUpload}
-                                            onRemove={handleRemove}
-                                            grid="grid-cols-5"
                                             title="Product Image"
-                                            existingImages={dataProduct?.data?.image || []}
+                                            imagePreviews={uploadedImages}
                                         />
                                     </FormControl>
                                     <FormMessage />

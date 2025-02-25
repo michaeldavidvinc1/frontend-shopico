@@ -57,7 +57,6 @@ export default async function ProductSeller ({params}:{ params: Promise<{ storeS
                 </div>
             </div>
             <ListProductSeller storeSlug={storeSlug} />
-           
         </div>
     );
 };

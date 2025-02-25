@@ -3,9 +3,13 @@ import { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const authOptions: AuthOptions = {
+    debug: true,
     session: {
         strategy: "jwt",
-        maxAge: 60 * 60 * 24, // 1 day
+        maxAge: 60 * 60 * 24, 
+    },
+    jwt: {
+        secret: process.env.NEXTAUTH_SECRET, // Pastikan ini ada di .env
     },
     pages: {
         signIn: ROUTES.LOGIN,
@@ -35,10 +39,10 @@ export const authOptions: AuthOptions = {
         }),
     ],
     callbacks: {
-        jwt: async ({ user, token }) => {
+        jwt: async ({ token, user }) => {
             if (user) {
                 token.id = user.id;
-                token.token = user.token;
+                token.token = user.token; // Pastikan ini ada
                 token.role = user.role;
             }
             return token;
