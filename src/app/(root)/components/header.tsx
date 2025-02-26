@@ -10,13 +10,11 @@ import { ROUTES } from "@/constant";
 import { useGetStoreByUserQuery } from "@/services/store.service";
 import { Session } from "next-auth";
 import { HeaderLandingSkeleton } from '@/components/skeleton/SkeletonHeaderLanding'
+import { useSession } from 'next-auth/react'
 
-interface HeaderPageProps {
-    session: Session | null;
-    status: "loading" | "authenticated" | "unauthenticated";
-}
 
-export default function HeaderPage({ session, status }: HeaderPageProps) {
+export default function HeaderPage() {
+    const { data: session, status } = useSession();
     const { data, isLoading: isStoreLoading } = useGetStoreByUserQuery(
         session?.user?.id as string,
         {
