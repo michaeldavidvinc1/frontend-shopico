@@ -205,37 +205,14 @@ const EditProductForm: FC<EditProductFormProps> = ({ storeSlug, productSlug }) =
                             <CardContent className="grid grid-cols-2 gap-4">
                                 <FormFieldInput control={form.control} name="name" label="Product Name" type="text" required />
                                 <FormFieldInput control={form.control} name="slug" label="Product Slug" type="text" required disabled />
-                                <FormField
-                                    control={form.control}
-                                    name="categoryId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Category Name</FormLabel>
-                                            <FormControl>
-                                                <Select value={field.value}
-                    onValueChange={field.onChange}>
-                                                    <SelectTrigger className="w-[180px]">
-                                                        <SelectValue placeholder="Category" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {dataCategory?.data?.map((item: Category) => (
-                                                            <SelectItem value={item.slug} key={item.id}>{item.name}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                {/* <FormFieldInput
+                                <FormFieldInput
                                     control={form.control}
                                     name="categoryId"
                                     label="Category"
                                     type="select"
                                     required
                                     options={dataCategory?.data?.map((item: Category) => ({ label: item.name, value: item.slug }))}
-                                /> */}
+                                />
                                 <FormFieldInput control={form.control} name="description" label="Description" type="textarea" />
                             </CardContent>
                         </Card>

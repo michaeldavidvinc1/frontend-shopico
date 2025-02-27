@@ -5,6 +5,7 @@ import { Heart, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import React, { FC } from 'react'
 import TabsExample from './tabs'
+import RelatedProduct from './related-product'
 
 interface CardDetailProductProps {
     slug: string
@@ -59,13 +60,7 @@ const CardDetailProduct: FC<CardDetailProductProps> = (slug) => {
                     </div>
                 </div>
                 <TabsExample />
-                <div>
-                    <div className="bg-gray-100 p-6 rounded-lg text-black">
-                        <h3 className="text-lg font-semibold mb-2">Customer Reviews</h3>
-                        <p className="text-gray-700">⭐⭐⭐⭐⭐ (5/5)</p>
-                        <p className="mt-2">"Produk ini sangat bagus! Kualitasnya luar biasa!"</p>
-                    </div>
-                </div>
+                <RelatedProduct />
             </div>
         </div>
     )

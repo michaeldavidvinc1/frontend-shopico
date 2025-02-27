@@ -2,6 +2,10 @@ import {BaseQueryFn, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@redu
 import {createApi} from '@reduxjs/toolkit/query/react'
 import {getSession, signOut} from "next-auth/react";
 
+interface ErrorResponse {
+    msg?: string;
+  }
+
 const baseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
     prepareHeaders: async(headers) => {
@@ -20,9 +24,9 @@ const baseQueryWithAuthHandling: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);
-    
+    const errorData = result.error?.data as ErrorResponse;
     // Cek jika error 401 (Unauthorized)
-    if (result.error?.status === 401) {
+    if (errorData?.msg === 'jwt expired') {
         const session = await getSession();
         
         // Jika ada session, lakukan sign out

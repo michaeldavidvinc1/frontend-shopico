@@ -3,6 +3,9 @@
 import { Heart, ShoppingCart } from 'lucide-react';
 import React from 'react';
 import StarRating from './rating-start';
+import { formatRupiah } from '@/utils/format-rupiah';
+import Link from 'next/link';
+import { ROUTES } from '@/constant';
 
 interface ProductCardProps {
     name: string;
@@ -10,9 +13,10 @@ interface ProductCardProps {
     harga: number;
     image: string;
     rating: number;
+    slug: string
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ name, category, harga, image, rating }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ name, category, harga, image, rating, slug }) => {
 
     return (
         <div className="w-64 p-4 bg-white rounded-lg shadow-sm border hover:scale-105 transition-transform duration-200 hover:shadow-lg">
@@ -25,37 +29,35 @@ const ProductCard: React.FC<ProductCardProps> = ({ name, category, harga, image,
                 </div>
             </div>
 
-            {/* Product Image */}
-            <div className="flex justify-center mb-4">
-                <img
-                    src={image}
-                    alt={name}
-                    className="w-full h-48 object-cover rounded-md"
-                />
-            </div>
-
-            {/* Product Info */}
-            <div className="flex flex-col gap-0 items-start">
-                <span className="text-xs text-muted-foreground">{category}</span>
-                <h3 className="text-lg text-black font-bold truncate">
-                    {name}
-                </h3>
-                <div className='flex items-center gap-2'>
-                    <StarRating rating={rating} />
-                    <span className='text-xs font-bold'>
-                        (12)
-                    </span>
+            <Link href={ROUTES.DETAIL_PRODUCT(slug)}>
+                {/* Product Image */}
+                <div className="flex justify-center mb-4">
+                    <img
+                        src={image}
+                        alt={name}
+                        className="w-full h-48 object-cover rounded-md"
+                    />
                 </div>
-            </div>
-            <div className='flex justify-between items-center mt-3'>
-                <p className="text-lg font-bold">
-                    ${harga}
-                </p>
-                <button className="flex gap-2 items-center text-xs bg-green-200 px-2 py-1 rounded-sm text-green-700 font-bold">
-                    <ShoppingCart className="w-4 h-4" />
-                    Add
-                </button>
-            </div>
+
+                {/* Product Info */}
+                <div className="flex flex-col gap-0 items-start">
+                    <span className="text-xs text-muted-foreground">{category}</span>
+                    <h3 className="text-lg text-black font-bold truncate">
+                        {name}
+                    </h3>
+                    <div className='flex items-center gap-2'>
+                        <StarRating rating={rating} />
+                        <span className='text-xs font-bold'>
+                            (12)
+                        </span>
+                    </div>
+                </div>
+                <div className='flex justify-between items-center mt-3'>
+                    <p className="text-md font-bold">
+                        {formatRupiah.format(harga)}
+                    </p>
+                </div>
+            </Link>
 
         </div>
     );

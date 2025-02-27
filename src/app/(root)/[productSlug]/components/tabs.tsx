@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Reviews from './review';
+import DescriptionProduct from './description';
 
 interface TabData {
   id: string;
@@ -18,7 +19,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, defaultActiveTab }) => {
   const [activeTab, setActiveTab] = useState<string>(defaultActiveTab || tabs[0].id);
 
   return (
-    <div className="w-full mt-8">
+    <div className="w-full mt-12">
       <div className="">
         <nav className="flex -mb-px justify-center items-center">
           {tabs.map((tab) => (
@@ -57,18 +58,18 @@ const Tabs: React.FC<TabsProps> = ({ tabs, defaultActiveTab }) => {
 const TabsExample: React.FC = () => {
   const exampleTabs: TabData[] = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      component: <Reviews />
+      id: 'description',
+      label: 'Description',
+      component: <DescriptionProduct />
     },
     {
-      id: 'users',
-      label: 'Pengguna',
+      id: 'review',
+      label: 'Reviews',
       component: <Reviews />
     },
   ];
 
-  return <Tabs tabs={exampleTabs} defaultActiveTab="dashboard" />;
+  return <Tabs tabs={exampleTabs} defaultActiveTab="description" />;
 };
 
 export default TabsExample;

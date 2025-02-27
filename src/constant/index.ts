@@ -21,4 +21,5 @@ export const ROUTES = {
     PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product`,
     CREATE_PRODUCT_SELLER: (slug: string) =>  `/store/${slug}/product/create`,
     EDIT_PRODUCT_SELLER: (slug: string, productSlug: string) =>  `/store/${slug}/product/${productSlug}/edit`,
+    DETAIL_PRODUCT: (slug: string) => `/${slug}`
 }

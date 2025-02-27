@@ -32,6 +32,7 @@ const BestSeller: FC<BestSellerProps> = ({data, isLoading}) => {
                                     name={item.name}
                                     category={item.category.name}
                                     harga={item.price}
+                                    slug={item.slug}
                                     image={item.image[0].url}
                                     rating={3}
                                 />
